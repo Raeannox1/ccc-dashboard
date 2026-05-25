@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corporate Command Centre</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-soft: #1f3a5f;
+      --green: #3fb950;
+      --green-soft: #0d2a13;
+      --amber: #d29922;
+      --amber-soft: #2d1f00;
+      --red: #f85149;
+      --red-soft: #3a0a0a;
+      --purple: #a5a0ff;
+      --purple-soft: #1c1a3a;
+      --r: 8px;
+      --rl: 12px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5; }
+
+    /* HEADER */
+    .hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .logo { font-size: 15px; font-weight: 700; color: var(--accent); }
+    .logo-sub { font-size: 11px; color: var(--muted); }
+    #clock { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    #date-disp { font-size: 11px; color: var(--muted); text-align: right; }
+
+    /* LAYOUT */
+    .main { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+
+    /* CARD */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rl); padding: 16px; animation: fi 0.25s ease; }
+    @keyframes fi { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .ch { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .ct { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+    .badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+    .bg { background: var(--green-soft); color: var(--green); }
+    .ba { background: var(--amber-soft); color: var(--amber); }
+    .br { background: var(--red-soft); color: var(--red); }
+    .bc { background: var(--accent-soft); color: var(--accent); }
+    .bp { background: var(--purple-soft); color: var(--purple); }
+
+    /* INPUTS */
+    .inp { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 8px 10px; color: var(--text); font-size: 13px; font-family: var(--font); outline: none; }
+    .inp:focus { border-color: var(--accent); }
+    textarea.inp { resize: vertical; min-height: 70px; }
+    select.inp { cursor: pointer; }
+
+    /* SLIDERS */
+    .slrow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .slrow label { font-size: 12px; color: var(--muted); min-width: 140px; }
+    .slrow input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--border); outline: none; }
+    .slrow input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+    .slval { font-size: 13px; font-weight: 700; min-width: 18px; text-align: right; }
+
+    /* BUTTONS */
+    .btn { padding: 7px 14px; border-radius: var(--r); font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: var(--font); transition: opacity 0.15s; }
+    .btn:hover { opacity: 0.82; }
+    .btn-p { background: var(--accent); color: #000; }
+    .btn-g { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-gn { background: var(--green); color: #000; }
+    .btn-r { background: var(--red); color: #fff; }
+    .btn-sm { padding: 5px 10px; font-size: 11px; }
+    .btn-xs { padding: 3px 8px; font-size: 10px; }
+    .btn-full { width: 100%; margin-top: 8px; }
+
+    /* TASKS */
+    .titem { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+    .titem:last-child { border-bottom: none; }
+    .tchk { width: 16px; height: 16px; border: 2px solid var(--border); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .tchk.on { background: var(--green); border-color: var(--green); }
+    .tchk.on::after { content: '✓'; font-size: 10px; color: #000; font-weight: 700; }
+    .ttxt { flex: 1; font-size: 13px; }
+    .ttxt.done { text-decoration: line-through; color: var(--muted); }
+    .tpri { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+    .ph { background: var(--red-soft); color: var(--red); }
+    .pm { background: var(--amber-soft); color: var(--amber); }
+    .pl { background: var(--green-soft); color: var(--green); }
+    .tadd { display: flex; gap: 6px; margin-top: 10px; }
+    .tadd input, .tadd select { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 6px 8px; color: var(--text); font-size: 12px; font-family: var(--font); outline: none; }
+    .tadd input { flex: 1; }
+    .tadd input:focus, .tadd select:focus { border-color: var(--accent); }
+
+    /* BURNOUT RING */
+    .ring-wrap { display: flex; flex-direction: column; align-items: center; padding: 8px 0; }
+    .ring-cont { position: relative; width: 96px; height: 96px; margin-bottom: 10px; }
+    .ring-svg { transform: rotate(-90deg); }
+    .rbg { fill: none; stroke: var(--surface2); stroke-width: 8; }
+    .rfill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease, stroke 0.3s; }
+    .ring-lbl { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+    .ring-num { font-size: 22px; font-weight: 700; line-height: 1; }
+    .ring-unit { font-size: 10px; color: var(--muted); }
+    .ring-status { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .ring-tip { font-size: 11px; color: var(--muted); text-align: center; max-width: 180px; }
+
+    /* INTERVIEW */
+    .iq-cat { font-size: 10px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+    .iq { background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 var(--r) var(--r) 0; padding: 10px 12px; font-size: 13px; line-height: 1.5; margin-bottom: 8px; }
+    .streak-row { display: flex; gap: 4px; align-items: center; }
+    .sdot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+    .sdot.on { background: var(--green); }
+    .sdot.today { background: var(--accent); }
+
+    /* WIN LOG */
+    .win-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .win-item:last-child { border-bottom: none; }
+    .wdot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-top: 6px; flex-shrink: 0; }
+    .wtxt { font-size: 13px; flex: 1; }
+    .wdate { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+    /* PEOPLE */
+    .pitem { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .pitem:last-child { border-bottom: none; }
+    .pav { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .pinfo { flex: 1; }
+    .pname { font-size: 13px; font-weight: 600; }
+    .prole { font-size: 11px; color: var(--muted); }
+
+    /* DECODE */
+    .dr { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 12px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+    .ds-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+
+    /* PHRASES */
+    .ph-item { background: var(--surface2); border-radius: var(--r); padding: 10px 12px; margin-bottom: 8px; border-left: 3px solid var(--accent); }
+    .ph-before { font-size: 12px; color: var(--red); margin-bottom: 4px; }
+    .ph-after { font-size: 13px; color: var(--green); font-weight: 500; }
+
+    /* GROWTH */
+    .cad { border: 1px solid var(--border); border-radius: var(--r); padding: 12px; margin-bottom: 10px; }
+    .cadh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .cadn { font-size: 13px; font-weight: 600; }
+    .cadt { font-size: 11px; color: var(--muted); }
+    .cbar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+    .cbarf { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
+
+    /* METRICS */
+    .mrow { margin-bottom: 12px; }
+    .mhdr { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .mlbl { font-size: 13px; }
+    .mval { font-size: 13px; font-weight: 700; }
+
+    /* WELLBEING */
+    .wbgrid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 14px; }
+    .wbm { background: var(--surface2); border-radius: var(--r); padding: 10px; text-align: center; }
+    .wbv { font-size: 24px; font-weight: 700; }
+    .wbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+
+    /* TABS */
+    .tab-bar { display: flex; gap: 3px; padding: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rl); margin-bottom: 16px; overflow-x: auto; scrollbar-width: none; }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tbtn { padding: 7px 14px; border-radius: var(--r); font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: var(--font); white-space: nowrap; color: var(--muted); background: transparent; transition: all 0.15s; }
+    .tbtn.on { background: var(--accent); color: #000; }
+    .tbtn:hover:not(.on) { background: var(--surface2); color: var(--text); }
+    .tc { display: none; }
+    .tc.on { display: block; }
+
+    /* DIVIDER */
+    .divlbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin: 20px 0 14px; display: flex; align-items: center; gap: 10px; }
+    .divlbl::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* EMERGENCY */
+    .em-btn { position: fixed; bottom: 22px; right: 22px; background: var(--red); color: #fff; border: none; border-radius: 50px; padding: 10px 18px; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(248,81,73,0.35); z-index: 200; font-family: var(--font); transition: transform 0.15s; }
+    .em-btn:hover { transform: scale(1.05); }
+    .em-ov { display: none; position: fixed; inset: 0; background: rgba(13,17,23,0.95); z-index: 300; justify-content: center; align-items: center; }
+    .em-ov.on { display: flex; }
+    .em-card { background: var(--surface); border: 2px solid var(--red); border-radius: var(--rl); padding: 28px; max-width: 460px; width: 90%; }
+    .em-title { font-size: 18px; font-weight: 700; color: var(--red); margin-bottom: 14px; text-align: center; }
+    .em-step { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--surface2); border-radius: var(--r); margin-bottom: 8px; }
+    .em-num { width: 24px; height: 24px; border-radius: 50%; background: var(--red); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    /* AI LOADING */
+    .dots { display: inline-flex; gap: 4px; align-items: center; }
+    .dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: bl 1.2s infinite; }
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bl { 0%,80%,100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) { .grid3 { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px) { .grid3 { grid-template-columns: 1fr; } .main { padding: 12px 14px; } }
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <div>
+    <div class="logo">⚡ Corporate Command Centre</div>
+    <div class="logo-sub">Personal Operating System</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <button class="btn btn-g btn-sm" onclick="openSettings()" title="API Key Settings" style="font-size:15px;padding:5px 10px;">⚙</button>
+    <div style="text-align:right">
+      <div id="date-disp"></div>
+      <div id="clock"></div>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- ROW 1 -->
+  <div class="grid3">
+
+    <!-- MORNING CHECK-IN -->
+    <div class="card">
+      <div class="ch"><span class="ct">Morning Check-in</span><span class="badge bc" id="ci-badge">Not done</span></div>
+      <div class="slrow"><label>Energy level</label><input type="range" min="1" max="10" value="7" id="sl-energy" oninput="uCI()"><span class="slval" id="sv-energy">7</span></div>
+      <div class="slrow"><label>Masking cost (social effort)</label><input type="range" min="1" max="10" value="4" id="sl-mask" oninput="uCI()"><span class="slval" id="sv-mask">4</span></div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Top priority today</div>
+        <textarea class="inp" id="ci-priority" rows="2" placeholder="The one thing that matters most today..."></textarea>
+      </div>
+      <button class="btn btn-p btn-full" onclick="saveCI()">Save Check-in</button>
+    </div>
+
+    <!-- TASKS -->
+    <div class="card">
+      <div class="ch"><span class="ct">Today's Tasks</span><span class="badge bc" id="task-ct">0 left</span></div>
+      <div id="task-list"></div>
+      <div class="tadd">
+        <input type="text" id="task-inp" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask()">
+        <select id="task-pri"><option value="high">High</option><option value="med" selected>Med</option><option value="low">Low</option></select>
+        <button class="btn btn-p btn-sm" onclick="addTask()">+</button>
+      </div>
+    </div>
+
+    <!-- BURNOUT -->
+    <div class="card">
+      <div class="ch"><span class="ct">Burnout Risk</span><span class="badge" id="bo-badge">—</span></div>
+      <div class="ring-wrap">
+        <div class="ring-cont">
+          <svg class="ring-svg" width="96" height="96" viewBox="0 0 96 96">
+            <circle class="rbg" cx="48" cy="48" r="38"/>
+            <circle class="rfill" id="bo-ring" cx="48" cy="48" r="38" stroke-dasharray="238.8" stroke-dashoffset="238.8"/>
+          </svg>
+          <div class="ring-lbl">
+            <div class="ring-num" id="bo-num">—</div>
+            <div class="ring-unit">/100</div>
+          </div>
+        </div>
+        <div class="ring-status" id="bo-status">Complete check-in</div>
+        <div class="ring-tip" id="bo-tip">Your check-in data calculates risk</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="grid3">
+
+    <!-- INTERVIEW ENGINE -->
+    <div class="card">
+      <div class="ch"><span class="ct">Interview Engine</span><span class="badge bp" id="prep-day">Day 1</span></div>
+      <div class="iq-cat" id="q-cat">—</div>
+      <div class="iq" id="q-text">Loading...</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="streak-row" id="q-streak"></div>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-g btn-xs" onclick="prevQ()">←</button>
+          <button class="btn btn-g btn-xs" onclick="nextQ()">→</button>
+          <button class="btn btn-p btn-xs" onclick="markQ()">✓ Done</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">Say it out loud. You'll find where you stumble.</div>
+    </div>
+
+    <!-- PEOPLE DUE -->
+    <div class="card">
+      <div class="ch"><span class="ct">People — Due Today</span><button class="btn btn-g btn-xs" onclick="showTab('people-tab')">All →</button></div>
+      <div id="due-list"><div style="color:var(--muted);font-size:13px">Add contacts to see who's due</div></div>
+    </div>
+
+    <!-- WIN LOG -->
+    <div class="card">
+      <div class="ch"><span class="ct">Win Log</span><span class="badge bg" id="win-ct">0 this week</span></div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <input class="inp" id="win-inp" placeholder="Log a win — anything counts..." onkeydown="if(event.key==='Enter')addWin()" style="font-size:13px">
+        <button class="btn btn-gn btn-sm" onclick="addWin()">+</button>
+      </div>
+      <div id="win-list"></div>
+    </div>
+  </div>
+
+  <!-- FULL APP TABS -->
+  <div class="divlbl">Full App</div>
+
+  <div class="tab-bar">
+    <button class="tbtn on" onclick="showTab('decode-tab')">Decode</button>
+    <button class="tbtn" onclick="showTab('tasks-tab')">Tasks</button>
+    <button class="tbtn" onclick="showTab('qbank-tab')">Q-Bank</button>
+    <button class="tbtn" onclick="showTab('growth-tab')">Growth</button>
+    <button class="tbtn" onclick="showTab('metrics-tab')">Metrics</button>
+    <button class="tbtn" onclick="showTab('people-tab')">People</button>
+    <button class="tbtn" onclick="showTab('wellbeing-tab')">Wellbeing</button>
+    <button class="tbtn" onclick="showTab('tracker-tab')">Tracker</button>
+    <button class="tbtn" onclick="showTab('phrases-tab')">Phrases</button>
+    <button class="tbtn" onclick="showTab('career-tab')">Career</button>
+  </div>
+
+  <!-- DECODE -->
+  <div id="decode-tab" class="tc on">
+    <div class="card">
+      <div class="ch"><span class="ct">Corporate Language Decoder</span><span class="badge bc">AI</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Paste any corporate message — email, Slack, feedback, PIP language, meeting summary</div>
+      <textarea class="inp" id="dec-in" placeholder="Paste the message here..." style="min-height:90px"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <select class="inp" id="dec-ctx" style="width:auto;padding:6px 10px">
+          <option value="general">General</option><option value="feedback">Feedback / review</option>
+          <option value="manager">Manager message</option><option value="pip">PIP / performance concern</option>
+          <option value="restructure">Restructure / redundancy</option><option value="slack">Slack / chat</option>
+        </select>
+        <button class="btn btn-p" onclick="doDecode()">Decode →</button>
+        <button class="btn btn-g" onclick="clearDecode()">Clear</button>
+      </div>
+      <div id="dec-out" style="display:none" class="dr">
+        <div style="margin-bottom:10px"><div class="ds-title" style="color:var(--muted)">Plain English</div><div id="dec-plain"></div></div>
+        <div style="margin-bottom:10px"><div class="ds-title" style="color:var(--amber)">Hidden subtext</div><div id="dec-sub"></div></div>
+        <div style="margin-bottom:10px"><div class="ds-title" style="color:var(--green)">Safe response</div><div id="dec-resp"></div></div>
+        <div><div class="ds-title" style="color:var(--red)">Risk signals</div><div id="dec-risk"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASKS FULL -->
+  <div id="tasks-tab" class="tc">
+    <div class="card">
+      <div class="ch"><span class="ct">AI Task Planner</span><span class="badge bc">AI</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Describe any task — AI generates a step-by-step plan with risks and clarification questions</div>
+      <textarea class="inp" id="tp-in" placeholder="Describe the task in detail. What is it, what does done look like, any background..." style="min-height:100px"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <select class="inp" id="tp-ctx" style="width:auto;padding:6px 10px">
+          <option value="urgent">Urgent + Important</option><option value="important">Important, not urgent</option>
+          <option value="quick">Quick win (&lt;15 min)</option><option value="complex">Complex / multi-step</option>
+          <option value="political">Politically sensitive</option>
+        </select>
+        <button class="btn btn-p" onclick="doTaskPlan()">Plan it →</button>
+      </div>
+      <div id="tp-out" style="display:none" class="dr" id="tp-content"></div>
+    </div>
+  </div>
+
+  <!-- Q-BANK -->
+  <div id="qbank-tab" class="tc">
+    <div class="card">
+      <div class="ch">
+        <span class="ct">Question Bank</span>
+        <select class="inp" id="qb-cat" style="width:auto;padding:4px 8px;font-size:11px" onchange="renderQB()">
+          <option value="all">All</option><option value="ownership">Ownership</option>
+          <option value="expectations">Expectations</option><option value="priority">Priority</option>
+          <option value="visibility">Visibility</option><option value="politics">Politics</option>
+          <option value="overwhelm">Overwhelm</option><option value="interview">Interview prep</option>
+        </select>
+      </div>
+      <div id="qb-list"></div>
+    </div>
+  </div>
+
+  <!-- GROWTH -->
+  <div id="growth-tab" class="tc">
+    <div class="card">
+      <div class="ch"><span class="ct">Growth Cadences</span><span class="badge bp">5 levels</span></div>
+      <div id="growth-list"></div>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div id="metrics-tab" class="tc">
+    <div class="card">
+      <div class="ch"><span class="ct">Performance Metrics</span><button class="btn btn-p btn-sm" onclick="doGapAnalysis()">AI Gap Analysis</button></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Rate yourself 1–10. Benchmarks are IB/HF/PE analyst-level expectations.</div>
+      <div id="metrics-list"></div>
+      <div id="gap-out" style="display:none" class="dr"></div>
+    </div>
+  </div>
+
+  <!-- PEOPLE -->
+  <div id="people-tab" class="tc">
+    <div class="card">
+      <div class="ch"><span class="ct">Relationship Tracker</span><button class="btn btn-p btn-sm" onclick="toggleAddP()">+ Add person</button></div>
+      <div id="add-p-form" style="display:none;margin-bottom:14px;padding:12px;background:var(--surface2);border-radius:var(--r)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <input class="inp" id="pf-name" placeholder="Name" style="padding:6px 8px;font-size:12px">
+          <input class="inp" id="pf-role" placeholder="Role / title" style="padding:6px 8px;font-size:12px">
+          <select class="inp" id="pf-level" style="padding:6px 8px;font-size:12px"><option>Junior</option><option>Peer</option><option>Senior</option><option>Manager</option><option>Executive</option></select>
+          <select class="inp" id="pf-cad" style="padding:6px 8px;font-size:12px"><option value="7">Weekly</option><option value="14">Bi-weekly</option><option value="30">Monthly</option><option value="90">Quarterly</option></select>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-p btn-sm" onclick="savePerson()">Save</button>
+          <button class="btn btn-g btn-sm" onclick="toggleAddP()">Cancel</button>
+        </div>
+      </div>
+      <div id="people-full"></div>
+    </div>
+  </div>
+
+  <!-- WELLBEING -->
+  <div id="wellbeing-tab" class="tc">
+    <div class="card">
+      <div class="ch"><span class="ct">Wellbeing Monitor</span><span class="badge" id="wb-badge">Check in first</span></div>
+      <div class="wbgrid" id="wb-metrics"></div>
+      <div class="divlbl">Regulation Toolkit</div>
+      <div id="reg-tools"></div>
+    </div>
+  </div>
+
+  <!-- TRACKER -->
+  <div id="tracker-tab" class="tc">
+    <div class="card">
+      <div class="ch"><span class="ct">Achievement Tracker</span><button class="btn btn-p btn-sm" onclick="doReflection()">AI Weekly Reflection</button></div>
+      <div class="divlbl">All Wins</div>
+      <div id="all-wins"></div>
+      <div id="refl-out" style="display:none" class="dr"></div>
+    </div>
+  </div>
+
+  <!-- PHRASES -->
+  <div id="phrases-tab" class="tc">
+    <div class="card">
+      <div class="ch"><span class="ct">Elite Communication Shifts</span><span class="badge bg">10 phrases</span></div>
+      <div id="phrases-list"></div>
+      <div class="divlbl">Live Rephraser</div>
+      <textarea class="inp" id="reph-in" placeholder="Paste a message to rephrase..." style="min-height:70px"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <select class="inp" id="reph-tone" style="width:auto;padding:6px 10px"><option value="neutral">Neutral</option><option value="warm">Warm</option><option value="assertive">Assertive</option><option value="executive">Executive</option></select>
+        <button class="btn btn-p" onclick="doRephrase()">Rephrase →</button>
+      </div>
+      <div id="reph-out" style="display:none" class="dr"></div>
+    </div>
+  </div>
+
+  <!-- CAREER TAB -->
+  <div id="career-tab" class="tc">
+
+    <!-- PROFILE -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="ch"><span class="ct">Career Profile</span><span class="badge bc">Nya-Raeann</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+        <div style="background:var(--surface2);border-radius:var(--r);padding:12px">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px">Current Role</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">Valuation Controller Analyst</div>
+          <div style="font-size:12px;color:var(--muted)">J.P. Morgan · Jul 2024 – May 2026</div>
+        </div>
+        <div style="background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--r);padding:12px">
+          <div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px">Target Role</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">Junior Fund Accountant</div>
+          <div style="font-size:12px;color:var(--muted)">PE / Hedge Fund · Active search</div>
+        </div>
+        <div style="background:var(--green-soft);border:1px solid var(--green);border-radius:var(--r);padding:12px">
+          <div style="font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px">Current Salary</div>
+          <div style="font-size:22px;font-weight:700;color:var(--green)">£46,500</div>
+          <div style="font-size:12px;color:var(--muted)">London · Right to Work ✓</div>
+        </div>
+      </div>
+
+      <!-- EXPERIENCE TIMELINE -->
+      <div class="divlbl">Employment History</div>
+      <div style="position:relative;padding-left:20px">
+        <div style="position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--border)"></div>
+        <div id="exp-timeline"></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+      <!-- SKILLS -->
+      <div class="card">
+        <div class="ch"><span class="ct">Skills Progress</span><span class="badge bc" id="skills-pct">—</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Drag to update your current level. Green bar = target.</div>
+        <div id="skills-list"></div>
+      </div>
+
+      <!-- QUALIFICATIONS -->
+      <div class="card">
+        <div class="ch"><span class="ct">Qualifications & Training</span></div>
+        <div id="qual-list"></div>
+        <div class="divlbl" style="margin-top:14px">Next to complete</div>
+        <div id="qual-next"></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+      <!-- JOB PIPELINE -->
+      <div class="card">
+        <div class="ch"><span class="ct">Job Search Pipeline</span><button class="btn btn-p btn-sm" onclick="toggleAddApp()">+ Add</button></div>
+        <div id="add-app-form" style="display:none;margin-bottom:12px;padding:10px;background:var(--surface2);border-radius:var(--r)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+            <input class="inp" id="app-co" placeholder="Company" style="padding:6px 8px;font-size:12px">
+            <input class="inp" id="app-role" placeholder="Role" style="padding:6px 8px;font-size:12px">
+            <select class="inp" id="app-status" style="padding:6px 8px;font-size:12px">
+              <option value="applied">Applied</option><option value="screen">Screening</option>
+              <option value="interview">Interview</option><option value="offer">Offer</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <input class="inp" id="app-date" type="date" style="padding:6px 8px;font-size:12px">
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-p btn-sm" onclick="saveApp()">Save</button>
+            <button class="btn btn-g btn-sm" onclick="toggleAddApp()">Cancel</button>
+          </div>
+        </div>
+
+        <!-- PIPELINE LANES -->
+        <div id="pipeline-board"></div>
+      </div>
+
+      <!-- MILESTONES -->
+      <div class="card">
+        <div class="ch"><span class="ct">Career Milestones</span><span class="badge bp" id="milestone-pct">—</span></div>
+        <div id="milestone-list"></div>
+      </div>
+    </div>
+
+    <!-- PROJECTS PORTFOLIO -->
+    <div class="card">
+      <div class="ch"><span class="ct">Projects Portfolio</span><span class="badge bg" id="proj-ct">—</span></div>
+      <div id="proj-list"></div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- EMERGENCY -->
+<!-- SETTINGS MODAL -->
+<div id="settings-ov" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeSettings()">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:24px;width:440px;max-width:92vw;">
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px;">⚙ Settings</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Your API key is stored only in this browser — never in the code.</div>
+    <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Anthropic API Key</label>
+    <input id="settings-key-inp" type="password" class="inp" placeholder="sk-ant-api03-..." style="margin-bottom:12px;">
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-g btn-sm" onclick="closeSettings()">Cancel</button>
+      <button class="btn btn-p btn-sm" onclick="saveSettings()">Save key</button>
+    </div>
+    <div id="settings-status" style="font-size:11px;color:var(--green);margin-top:8px;min-height:14px;"></div>
+  </div>
+</div>
+
+<button class="em-btn" onclick="document.getElementById('em-ov').classList.add('on')">🚨 Emergency</button>
+<div id="em-ov" class="em-ov" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="em-card">
+    <div class="em-title">🚨 You're Overwhelmed. That's Okay.</div>
+    <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px">Do these three things. Nothing else.</div>
+    <div class="em-step"><div class="em-num">1</div><div>Breathe. 4 counts in — 4 hold — 4 out. Once. Right now.</div></div>
+    <div class="em-step"><div class="em-num">2</div><div><strong>Name the one thing.</strong> What is the single most important item right now?<br><input class="inp" placeholder="The one thing..." style="margin-top:6px;font-size:12px;padding:6px 8px"></div></div>
+    <div class="em-step"><div class="em-num">3</div><div><strong>Communicate early.</strong> "I'm working through [X]. I'll update you by [time]." Send that message now.</div></div>
+    <button class="btn btn-g btn-full" onclick="document.getElementById('em-ov').classList.remove('on')">I'm okay — close this</button>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+let API_KEY = localStorage.getItem('ccc_api_key') || '';
+
+// ─── DATA ─────────────────────────────────────────────────
+const QUESTIONS = [
+  {cat:'Opening', q:'Tell me about yourself.'},
+  {cat:'Opening', q:'Why are you leaving JPMorgan?'},
+  {cat:'Opening', q:'Why leave without something lined up?'},
+  {cat:'Opening', q:'Your CV shows a gap between Deutsche Bank and JPM. What were you doing?'},
+  {cat:'Opening', q:"You don't have a degree. How do I justify hiring you to my director?"},
+  {cat:'Opening', q:'What do you find difficult?'},
+  {cat:'Opening', q:'You were a software engineer — why finance?'},
+  {cat:'Competency', q:'Walk me through a reconciliation you\'ve done and how you investigated a break.'},
+  {cat:'Competency', q:'Tell me about a time you worked under deadline pressure.'},
+  {cat:'Competency', q:'Describe a time you used data or automation to improve a process.'},
+  {cat:'Competency', q:'Why are you leaving JPM / why fund accounting specifically?'},
+  {cat:'Competency', q:'Why do you want to work here specifically?'},
+  {cat:'Dangerous', q:'Tell me about a time you worked through a complex NAV break.'},
+  {cat:'Dangerous', q:'If an investor called asking why their redemption value was lower than expected, what would you do first?'},
+  {cat:'Dangerous', q:"You've only been in finance for less than two years. Why hire you over someone with fund accounting experience?"},
+  {cat:'Dangerous', q:'What would you do in your first 30 days?'},
+  {cat:'Dangerous', q:'How would you handle a month-end close if you hit an unresolved break at 4:30pm?'},
+  {cat:'Technical', q:'What is NAV and how is it calculated?'},
+  {cat:'Technical', q:'What happens during a cash reconciliation?'},
+  {cat:'Technical', q:'What are corporate actions and why are they operationally high risk?'},
+  {cat:'Technical', q:"What's the difference between hedge fund and PE fund accounting?"},
+  {cat:'Technical', q:'Walk me through a waterfall calculation.'},
+  {cat:'Technical', q:'What do you know about Geneva?'},
+  {cat:'Behavioural', q:'What are your strengths and weaknesses?'},
+  {cat:'Behavioural', q:'Where do you see yourself in five years?'},
+  {cat:'Behavioural', q:'Tell me about a time you made a mistake.'},
+  {cat:'Behavioural', q:'Tell me about a time you had to learn something new quickly.'},
+  {cat:'Behavioural', q:'How do you handle working with people who operate differently to you?'},
+  {cat:'Behavioural', q:'How do you stay up to date with financial markets?'},
+  {cat:'Behavioural', q:"What's your biggest career achievement?"},
+  {cat:'Behavioural', q:'How do you handle repetitive work?'},
+  {cat:'Behavioural', q:'Tell me about a time you disagreed with a decision at work.'},
+  {cat:'Behavioural', q:'Are you applying to other roles?'},
+];
+
+const QBANK = [
+  {cat:'ownership', q:'Who owns the final decision on this?'},
+  {cat:'ownership', q:"If I complete this, what does success look like to you?"},
+  {cat:'ownership', q:'What would you do differently if you were doing this yourself?'},
+  {cat:'expectations', q:"What does 'doing this well' look like from your perspective?"},
+  {cat:'expectations', q:"What's the main risk you're trying to avoid here?"},
+  {cat:'expectations', q:'What would make you flag this as a concern vs a success?'},
+  {cat:'priority', q:'If I can only do one of these today, which matters most?'},
+  {cat:'priority', q:"What's the hard deadline on this?"},
+  {cat:'priority', q:"Is this more important than what I'm currently working on?"},
+  {cat:'visibility', q:'Who else should know about this work when it\'s complete?'},
+  {cat:'visibility', q:'Would it be useful for me to present this in the next team meeting?'},
+  {cat:'visibility', q:'Who are the key stakeholders I should loop in?'},
+  {cat:'politics', q:'Is there any sensitivity I should be aware of in how this is presented?'},
+  {cat:'politics', q:'Are there stakeholders who might push back on this?'},
+  {cat:'politics', q:"What's the political context I should understand before engaging?"},
+  {cat:'overwhelm', q:'I have X, Y, Z competing — can you help me prioritise?'},
+  {cat:'overwhelm', q:"I want to make sure I'm not missing something critical. Can we do a quick priority check?"},
+  {cat:'overwhelm', q:"I'm going to give you an end-of-day update — anything I should flag proactively?"},
+  {cat:'interview', q:'What does the team structure look like and who would I work most closely with?'},
+  {cat:'interview', q:"What's the most common mistake junior fund accountants make in their first six months?"},
+  {cat:'interview', q:'Where is the team in terms of automation and tooling?'},
+  {cat:'interview', q:'What does progression look like from junior to senior fund accountant here?'},
+  {cat:'interview', q:"What's the NAV production cadence — daily, weekly, monthly?"},
+  {cat:'interview', q:'Do you run fund accounting in-house or through a third-party administrator?'},
+  {cat:'interview', q:"Most Geneva breaks trace back to the Security Master. How do you handle new security onboarding?"},
+];
+
+const PHRASES = [
+  {b:"I don't know / I'm not sure", a:"Let me check and confirm — I'll come back to you by [time]."},
+  {b:"I disagree / That's wrong", a:"I want to make sure I understand correctly — are you saying [X]? Because my understanding is [Y]."},
+  {b:"That's not my fault", a:"Here's what happened, here's my role in it, and here's what I've done to resolve it."},
+  {b:"I can't do that / I don't have time", a:"I'm on [X] with [deadline]. To take this on I'd need to deprioritise [Y] — is that okay?"},
+  {b:"Why wasn't I in that meeting?", a:"I noticed I wasn't included in [meeting]. I'd like to understand whether my input would be valuable — can you help me understand the scope?"},
+  {b:"I'm confused / overwhelmed", a:"I want to make sure I'm focusing on the right things. My current priority is [X] — is there something more urgent I should know about?"},
+  {b:"I finished / Done", a:"Completed [X]. Output: [brief]. Flag (if any): [Y]. Happy to discuss if useful."},
+  {b:"Can you explain?", a:"My understanding is [X]. Where I'm uncertain is [Y]. Can you confirm whether [specific question]?"},
+  {b:"I made a mistake", a:"I want to flag something. [What happened]. I've already [corrective action]. Next step I'd suggest: [specific action]."},
+  {b:"I need your help", a:"I'm working on [X]. I'm blocked at [specific point]. My understanding: [Y]. I need [specific input]."},
+];
+
+const CADENCES = [
+  {name:'Weekly', time:'15 min', items:['Interpersonal pulse — how are my key relationships this week?','Masking cost — how much am I spending on social performance?','Communication wins — what landed well this week?','One thing to improve next week']},
+  {name:'Bi-weekly', time:'20 min', items:['Pattern recognition — is any friction repeating?','Manager warmth signals — is the relationship moving?','Informal loop — am I included in the right conversations?','One relationship to invest in this fortnight']},
+  {name:'Monthly', time:'45 min', items:['Political capital audit — who is currently an ally?','Visibility assessment — who knows what I\'m working on?','Feedback inventory — explicit vs. implied feedback received','Senior relationship temperature check']},
+  {name:'Quarterly', time:'60 min', items:["Career trajectory — am I on the path I want?",'Reputation audit — how am I perceived vs. how I want to be?','Relationship targeting — one new relationship to build','Compensation signals — is my value reflected?']},
+  {name:'Yearly', time:'2–3 hrs', items:['Full network map — sponsors, advocates, neutrals, detractors','BATNA — what is my alternative to staying?','Masking sustainability — is this career sustainable for me?','Identity check — does this still align with who I want to be?']},
+];
+
+const METRICS_DEF = [
+  {id:'tech', l:'Technical Accuracy', b:8},
+  {id:'speed', l:'Delivery Speed', b:7},
+  {id:'comm', l:'Communication Quality', b:7},
+  {id:'stak', l:'Stakeholder Management', b:7},
+  {id:'pro', l:'Proactivity', b:8},
+  {id:'proc', l:'Process Knowledge', b:7},
+  {id:'meet', l:'Meeting Contribution', b:6},
+  {id:'writ', l:'Written Output', b:8},
+  {id:'err', l:'Error Rate (lower = better)', b:3},
+  {id:'vis', l:'Senior Visibility', b:6},
+];
+
+const REG_TOOLS = [
+  {n:'Noise break', d:'Step away from screens for 5 minutes. Find a quiet space.'},
+  {n:'Body reset', d:'Walk to another floor. Get water. Change your physical state.'},
+  {n:'Brain dump', d:'Write every pending task/thought onto paper. Empty the working memory buffer.'},
+  {n:'Masking check', d:"Notice how much social performance you've done today. That's a real cognitive cost."},
+  {n:'Priority anchor', d:'Write the single most important thing. Ignore everything else for 20 minutes.'},
+];
+
+const AV_COLOURS = ['#58a6ff','#3fb950','#d29922','#a5a0ff','#f85149'];
+
+// ─── STATE ────────────────────────────────────────────────
+let S = {tasks:[], wins:[], people:[], metrics:{},
+  ci:{energy:7, mask:4, priority:'', done:false},
+  growth:{}, interview:{idx:0, done:[], streak:[]}};
+
+function load() { try { const d=localStorage.getItem('ccc'); if(d) S={...S,...JSON.parse(d)}; } catch(e){} }
+function save() { try { localStorage.setItem('ccc', JSON.stringify(S)); } catch(e){} }
+
+// ─── CLOCK ────────────────────────────────────────────────
+function tick() {
+  const n=new Date();
+  document.getElementById('clock').textContent = n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('date-disp').textContent = n.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+// ─── CHECK-IN ─────────────────────────────────────────────
+function uCI() {
+  const e=document.getElementById('sl-energy').value;
+  const m=document.getElementById('sl-mask').value;
+  document.getElementById('sv-energy').textContent=e;
+  document.getElementById('sv-mask').textContent=m;
+  S.ci.energy=+e; S.ci.mask=+m;
+  updateBurnout(); renderWellbeing();
+}
+
+function saveCI() {
+  S.ci.priority=document.getElementById('ci-priority').value;
+  S.ci.done=true;
+  document.getElementById('ci-badge').textContent='Done ✓';
+  document.getElementById('ci-badge').className='badge bg';
+  save(); updateBurnout(); renderWellbeing();
+}
+
+// ─── BURNOUT ──────────────────────────────────────────────
+function updateBurnout() {
+  const risk=Math.min(100,Math.max(0,Math.round((10-S.ci.energy)*5+S.ci.mask*5)));
+  const C=238.8, offset=C-(risk/100)*C;
+  const ring=document.getElementById('bo-ring');
+  const num=document.getElementById('bo-num');
+  const status=document.getElementById('bo-status');
+  const tip=document.getElementById('bo-tip');
+  const badge=document.getElementById('bo-badge');
+  ring.style.strokeDashoffset=offset;
+  num.textContent=risk;
+  if(risk<=30){ring.style.stroke='#3fb950';num.style.color='#3fb950';status.textContent='Low Risk';status.style.color='#3fb950';badge.textContent='Low';badge.className='badge bg';}
+  else if(risk<=60){ring.style.stroke='#d29922';num.style.color='#d29922';status.textContent='Moderate Risk';status.style.color='#d29922';badge.textContent='Moderate';badge.className='badge ba';}
+  else{ring.style.stroke='#f85149';num.style.color='#f85149';status.textContent='High Risk';status.style.color='#f85149';badge.textContent='High';badge.className='badge br';}
+  const tips=['Good capacity. Push on your main priority.','Protect your energy. Avoid unnecessary social output.',"Consider a regulation break. Don't commit to anything new today."];
+  tip.textContent=risk<=30?tips[0]:risk<=60?tips[1]:tips[2];
+}
+
+// ─── TASKS ────────────────────────────────────────────────
+function renderTasks() {
+  const tl=document.getElementById('task-list');
+  const rem=S.tasks.filter(t=>!t.done).length;
+  document.getElementById('task-ct').textContent=`${rem} left`;
+  if(!S.tasks.length){tl.innerHTML='<div style="color:var(--muted);font-size:13px;padding:6px 0">No tasks yet</div>';return;}
+  tl.innerHTML=S.tasks.map((t,i)=>`
+    <div class="titem">
+      <div class="tchk${t.done?' on':''}" onclick="toggleTask(${i})"></div>
+      <span class="ttxt${t.done?' done':''}">${esc(t.text)}</span>
+      <span class="tpri p${t.pri}">${t.pri}</span>
+    </div>`).join('');
+}
+
+function addTask(){
+  const inp=document.getElementById('task-inp');
+  if(!inp.value.trim())return;
+  S.tasks.push({text:inp.value.trim(),pri:document.getElementById('task-pri').value,done:false});
+  inp.value=''; renderTasks(); save();
+}
+
+function toggleTask(i){S.tasks[i].done=!S.tasks[i].done;renderTasks();save();}
+
+// ─── WINS ─────────────────────────────────────────────────
+function renderWins(){
+  const wl=document.getElementById('win-list');
+  const aw=document.getElementById('all-wins');
+  const week=Date.now()-7*864e5;
+  const recent=S.wins.filter(w=>w.t>week);
+  document.getElementById('win-ct').textContent=`${recent.length} this week`;
+  const html=w=>`<div class="win-item"><div class="wdot"></div><div class="wtxt">${esc(w.text)}</div><div class="wdate">${new Date(w.t).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div></div>`;
+  wl.innerHTML=recent.slice(0,4).map(html).join('')||'<div style="color:var(--muted);font-size:13px">No wins this week yet</div>';
+  if(aw) aw.innerHTML=S.wins.map(html).join('')||'<div style="color:var(--muted);font-size:13px">No wins logged yet</div>';
+}
+
+function addWin(){
+  const inp=document.getElementById('win-inp');
+  if(!inp.value.trim())return;
+  S.wins.unshift({text:inp.value.trim(),t:Date.now()});
+  inp.value=''; renderWins(); save();
+}
+
+// ─── INTERVIEW ────────────────────────────────────────────
+function renderInterview(){
+  const q=QUESTIONS[S.interview.idx%QUESTIONS.length];
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('q-cat').textContent=q.cat;
+  const day=Math.floor((S.interview.done||[]).length/3)+1;
+  document.getElementById('prep-day').textContent=`Day ${day}`;
+  const streak=document.getElementById('q-streak');
+  const s=S.interview.streak||[];
+  streak.innerHTML=Array.from({length:7},(_,i)=>`<div class="sdot${i<s.length?' on':''}"></div>`).join('');
+}
+
+function nextQ(){S.interview.idx=(S.interview.idx+1)%QUESTIONS.length;renderInterview();save();}
+function prevQ(){S.interview.idx=(S.interview.idx-1+QUESTIONS.length)%QUESTIONS.length;renderInterview();save();}
+function markQ(){
+  if(!S.interview.done)S.interview.done=[];
+  S.interview.done.push(S.interview.idx);
+  const today=new Date().toDateString();
+  if(!S.interview.streak)S.interview.streak=[];
+  if(!S.interview.streak.includes(today)){S.interview.streak.push(today);if(S.interview.streak.length>7)S.interview.streak.shift();}
+  nextQ();
+}
+
+// ─── PEOPLE ───────────────────────────────────────────────
+function renderPeople(){
+  const now=Date.now();
+  const full=document.getElementById('people-full');
+  const due=document.getElementById('due-list');
+  if(!S.people.length){
+    if(full) full.innerHTML='<div style="color:var(--muted);font-size:13px">No people tracked yet</div>';
+    if(due) due.innerHTML='<div style="color:var(--muted);font-size:13px">Add contacts to see who\'s due</div>';
+    return;
+  }
+  const row=(p,i,showBtn)=>{
+    const ds=p.last?Math.floor((now-p.last)/864e5):999;
+    const od=ds>=p.cad;
+    const col=AV_COLOURS[i%AV_COLOURS.length];
+    return `<div class="pitem">
+      <div class="pav" style="background:${col}20;color:${col}">${p.name.slice(0,2).toUpperCase()}</div>
+      <div class="pinfo"><div class="pname">${esc(p.name)}</div><div class="prole">${esc(p.role)} · ${esc(p.level)}</div></div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:${od?'var(--amber)':'var(--muted)'}">${ds===999?'Never':`${ds}d ago`}</div>
+        ${showBtn?`<button class="btn btn-g btn-xs" style="margin-top:4px" onclick="contacted(${i})">✓ Done</button>`:''}
+      </div>
+    </div>`;
+  };
+  if(full) full.innerHTML=S.people.map((p,i)=>row(p,i,true)).join('');
+  const dueP=S.people.filter(p=>{ const ds=p.last?Math.floor((now-p.last)/864e5):999; return ds>=p.cad; });
+  if(due) due.innerHTML=dueP.length?dueP.map((p)=>row(p,S.people.indexOf(p),true)).join(''):'<div style="color:var(--muted);font-size:13px">All contacts up to date ✓</div>';
+}
+
+function toggleAddP(){
+  const f=document.getElementById('add-p-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+}
+
+function savePerson(){
+  const name=document.getElementById('pf-name').value.trim();
+  if(!name)return;
+  S.people.push({name,role:document.getElementById('pf-role').value.trim(),level:document.getElementById('pf-level').value,cad:+document.getElementById('pf-cad').value,last:null});
+  document.getElementById('pf-name').value='';document.getElementById('pf-role').value='';
+  document.getElementById('add-p-form').style.display='none';
+  renderPeople(); save();
+}
+
+function contacted(i){S.people[i].last=Date.now();renderPeople();save();}
+
+// ─── Q-BANK ───────────────────────────────────────────────
+function renderQB(){
+  const cat=document.getElementById('qb-cat').value;
+  const f=cat==='all'?QBANK:QBANK.filter(q=>q.cat===cat);
+  document.getElementById('qb-list').innerHTML=f.map(q=>`
+    <div class="titem" style="flex-direction:column;align-items:flex-start;gap:4px;padding:10px 0">
+      <div style="font-size:13px">${esc(q.q)}</div>
+      <span class="badge bc" style="font-size:9px">${q.cat}</span>
+    </div>`).join('');
+}
+
+// ─── GROWTH ───────────────────────────────────────────────
+function renderGrowth(){
+  document.getElementById('growth-list').innerHTML=CADENCES.map((c,ci)=>{
+    const k=`g${ci}`;
+    const done=c.items.filter((_,ii)=>S.growth[`${k}-${ii}`]).length;
+    return `<div class="cad">
+      <div class="cadh"><span class="cadn">${c.name}</span><span class="cadt">${c.time}</span></div>
+      <div class="cbar"><div class="cbarf" style="width:${(done/c.items.length)*100}%"></div></div>
+      ${c.items.map((item,ii)=>`
+        <div class="titem">
+          <div class="tchk${S.growth[`${k}-${ii}`]?' on':''}" onclick="toggleGrow('${k}',${ii})"></div>
+          <span class="ttxt${S.growth[`${k}-${ii}`]?' done':''}">${esc(item)}</span>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function toggleGrow(k,ii){S.growth[`${k}-${ii}`]=!S.growth[`${k}-${ii}`];renderGrowth();save();}
+
+// ─── METRICS ──────────────────────────────────────────────
+function renderMetrics(){
+  document.getElementById('metrics-list').innerHTML=METRICS_DEF.map(m=>{
+    const v=S.metrics[m.id]||5;
+    const col=v>=m.b?'#3fb950':v>=m.b-2?'#d29922':'#f85149';
+    return `<div class="mrow">
+      <div class="mhdr"><span class="mlbl">${m.l}</span><span class="mval" style="color:${col}">${v}/10</span></div>
+      <div class="slrow" style="margin-bottom:0">
+        <input type="range" min="1" max="10" value="${v}" oninput="setMetric('${m.id}',this.value)" style="flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--border);outline:none">
+        <span style="font-size:11px;color:var(--muted)">benchmark: ${m.b}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setMetric(id,v){S.metrics[id]=+v;renderMetrics();save();}
+
+// ─── WELLBEING ────────────────────────────────────────────
+function renderWellbeing(){
+  const e=S.ci.energy, m=S.ci.mask, s=Math.max(0,10-m), c=S.ci.priority?8:4;
+  const ms=[{l:'Energy',v:e},{l:'Social Battery',v:s},{l:'Masking Load',v:m},{l:'Clarity',v:c}];
+  const risk=Math.round(((10-e)*3+m*2)/5);
+  document.getElementById('wb-badge').textContent=risk<=3?'✓ Good':risk<=6?'⚠ Watch':'🔴 High';
+  document.getElementById('wb-badge').className=`badge ${risk<=3?'bg':risk<=6?'ba':'br'}`;
+  document.getElementById('wb-metrics').innerHTML=ms.map(x=>{
+    const isLoad=x.l==='Masking Load';
+    const col=isLoad?(x.v>=7?'#f85149':x.v>=4?'#d29922':'#3fb950'):(x.v>=7?'#3fb950':x.v>=4?'#d29922':'#f85149');
+    return `<div class="wbm"><div class="wbv" style="color:${col}">${x.v}<span style="font-size:14px">/10</span></div><div class="wbl">${x.l}</div></div>`;
+  }).join('');
+  document.getElementById('reg-tools').innerHTML=REG_TOOLS.map(t=>`
+    <div class="cad" style="margin-bottom:8px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:3px">${t.n}</div>
+      <div style="font-size:12px;color:var(--muted)">${t.d}</div>
+    </div>`).join('');
+}
+
+// ─── PHRASES ──────────────────────────────────────────────
+function renderPhrases(){
+  document.getElementById('phrases-list').innerHTML=PHRASES.map(p=>`
+    <div class="ph-item">
+      <div class="ph-before">✗ "${esc(p.b)}"</div>
+      <div class="ph-after">✓ "${esc(p.a)}"</div>
+    </div>`).join('');
+}
+
+// ─── TABS ─────────────────────────────────────────────────
+const TABS=['decode-tab','tasks-tab','qbank-tab','growth-tab','metrics-tab','people-tab','wellbeing-tab','tracker-tab','phrases-tab','career-tab'];
+function showTab(id){
+  TABS.forEach(t=>document.getElementById(t).classList.remove('on'));
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelectorAll('.tbtn')[TABS.indexOf(id)]?.classList.add('on');
+  if(id==='people-tab')renderPeople();
+  if(id==='wellbeing-tab')renderWellbeing();
+  if(id==='growth-tab')renderGrowth();
+  if(id==='metrics-tab')renderMetrics();
+  if(id==='tracker-tab')renderWins();
+  if(id==='career-tab')renderCareer();
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────
+function openSettings(){
+  const ov=document.getElementById('settings-ov');
+  document.getElementById('settings-key-inp').value=API_KEY||'';
+  document.getElementById('settings-status').textContent='';
+  ov.style.display='flex';
+}
+function closeSettings(){
+  document.getElementById('settings-ov').style.display='none';
+}
+function saveSettings(){
+  const v=document.getElementById('settings-key-inp').value.trim();
+  if(!v){document.getElementById('settings-status').style.color='var(--red)';document.getElementById('settings-status').textContent='Key cannot be empty.';return;}
+  API_KEY=v;
+  localStorage.setItem('ccc_api_key',v);
+  document.getElementById('settings-status').style.color='var(--green)';
+  document.getElementById('settings-status').textContent='Saved! AI features are now active.';
+  setTimeout(closeSettings,1200);
+}
+
+// ─── AI ───────────────────────────────────────────────────
+function dots(){return `<div class="dots"><span></span><span></span><span></span></div>`;}
+
+async function ai(prompt){
+  if(!API_KEY) return '[Click ⚙ in the top-right to add your API key and enable AI features]';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:600,messages:[{role:'user',content:prompt}]})
+    });
+    const d=await r.json();
+    return d.content?.[0]?.text||'No response';
+  }catch(e){return `Error: ${e.message}`;}
+}
+
+async function doDecode(){
+  const text=document.getElementById('dec-in').value.trim();
+  if(!text)return;
+  const ctx=document.getElementById('dec-ctx').value;
+  const out=document.getElementById('dec-out');
+  out.style.display='block';
+  document.getElementById('dec-plain').innerHTML=dots();
+  document.getElementById('dec-sub').innerHTML='';
+  document.getElementById('dec-resp').innerHTML='';
+  document.getElementById('dec-risk').innerHTML='';
+  const res=await ai(`You are a corporate language decoder for a neurodivergent finance professional.\nContext: ${ctx}\nMessage: "${text}"\n\nRespond EXACTLY in this format:\nPLAIN: [one sentence plain English]\nSUBTEXT: [one sentence on the real underlying message]\nRESPONSE: [one safe, concrete response they can use]\nRISK: [any risk signals, or "None detected"]`);
+  document.getElementById('dec-plain').textContent=res.match(/PLAIN:\s*(.+)/)?.[1]||res;
+  document.getElementById('dec-sub').textContent=res.match(/SUBTEXT:\s*(.+)/)?.[1]||'';
+  document.getElementById('dec-resp').textContent=res.match(/RESPONSE:\s*(.+)/)?.[1]||'';
+  document.getElementById('dec-risk').textContent=res.match(/RISK:\s*(.+)/)?.[1]||'';
+}
+
+function clearDecode(){document.getElementById('dec-in').value='';document.getElementById('dec-out').style.display='none';}
+
+async function doTaskPlan(){
+  const text=document.getElementById('tp-in').value.trim();
+  if(!text)return;
+  const ctx=document.getElementById('tp-ctx').value;
+  const out=document.getElementById('tp-out');
+  out.style.display='block';
+  out.innerHTML=dots();
+  out.innerHTML=await ai(`Task planner for a neurodivergent finance professional.\nTask: ${text}\nContext: ${ctx}\nGive: numbered steps (max 5), then 2 risks, then 2 clarification questions to ask before starting. Be direct and specific.`);
+}
+
+async function doGapAnalysis(){
+  const scores=METRICS_DEF.map(m=>`${m.l}: ${S.metrics[m.id]||5}/10 (benchmark: ${m.b})`).join('\n');
+  const out=document.getElementById('gap-out');
+  out.style.display='block';
+  out.innerHTML=dots();
+  out.innerHTML=await ai(`Performance gap analysis for a junior finance analyst (JPMorgan VCG, targeting fund accounting).\n\nScores:\n${scores}\n\nIdentify the top 2 gaps. For each: one specific, actionable improvement. Be direct.`);
+}
+
+async function doReflection(){
+  const wins=S.wins.slice(0,10).map(w=>w.text).join('\n')||'None logged';
+  const out=document.getElementById('refl-out');
+  out.style.display='block';
+  out.innerHTML=dots();
+  out.innerHTML=await ai(`Weekly reflection for a finance professional (VCG analyst, moving to fund accounting).\n\nWins this week:\n${wins}\n\nWrite a 3-sentence reflection: what the pattern shows, one skill being built, one focus for next week.`);
+}
+
+async function doRephrase(){
+  const text=document.getElementById('reph-in').value.trim();
+  if(!text)return;
+  const tone=document.getElementById('reph-tone').value;
+  const out=document.getElementById('reph-out');
+  out.style.display='block';
+  out.innerHTML=dots();
+  out.innerHTML=await ai(`Rephrase this workplace message in a ${tone} tone for a finance professional. Concise and professional.\n\nOriginal: "${text}"\n\nRephrased:`);
+}
+
+// ─── CAREER DATA ──────────────────────────────────────────
+const EXPERIENCE = [
+  {role:'Valuation Controller Analyst', co:'J.P. Morgan', dates:'Jul 2024 – May 2026', colour:'var(--accent)',
+   bullets:['Independent price verification across IR & fixed income products','Daily P&L, month-end close, audit documentation','Sigma formula automation + z-score Totem outlier detection (both in production)','Bloomberg, Athena, Orion, Python, Excel, Alteryx']},
+  {role:'Junior Full-Stack Software Engineer', co:'Deutsche Bank', dates:'Jul 2022 – May 2023', colour:'var(--amber)',
+   bullets:['Built and maintained internal finance applications','Test coverage 60% → 90%+; dashboard load time reduced ~50%','SQL, Java, Spring Boot, cross-functional delivery']},
+  {role:'Junior Accounts Assistant', co:'Tarem Services Limited', dates:'Jul 2021 – Dec 2022', colour:'var(--green)',
+   bullets:['Reconciliations, invoice processing, accounts receivable','Early exposure to financial accuracy and controls work']},
+];
+
+const SKILLS_DEF = [
+  {id:'sk-python',   l:'Python',                  cur:7,  tgt:9},
+  {id:'sk-sql',      l:'SQL',                     cur:7,  tgt:8},
+  {id:'sk-excel',    l:'Excel (Advanced)',         cur:8,  tgt:9},
+  {id:'sk-alteryx',  l:'Alteryx',                 cur:6,  tgt:8},
+  {id:'sk-bloomberg',l:'Bloomberg Terminal',       cur:8,  tgt:9},
+  {id:'sk-tableau',  l:'Tableau',                 cur:6,  tgt:7},
+  {id:'sk-fundacc',  l:'Fund Accounting (NAV)',    cur:4,  tgt:9},
+  {id:'sk-geneva',   l:'Geneva / Investran',       cur:3,  tgt:8},
+  {id:'sk-markets',  l:'Financial Markets',        cur:8,  tgt:9},
+  {id:'sk-controls', l:'Controls & Reconciliation',cur:8,  tgt:9},
+];
+
+const QUALS = [
+  {label:'GCSEs — 9 subjects (grades 9–4)',          done:true,  inst:'St Matthew Academy'},
+  {label:'Albany Beck Software Engineering Programme',done:true,  inst:'Albany Beck 2022'},
+  {label:'La Fosse Tech Pioneer Programme',           done:true,  inst:'La Fosse Academy 2024'},
+  {label:'AAT Level 2',                               done:true,  inst:'Accounting qualification'},
+  {label:'Tableau Certification',                     done:true,  inst:'Tableau'},
+  {label:'Financial Analyst Training',                done:true,  inst:'Self-directed'},
+  {label:'AAT Level 3',                               done:false, inst:'Next qualification target'},
+  {label:'AAT Level 4',                               done:false, inst:'Planned after Level 3'},
+  {label:'CFA Level 1',                               done:false, inst:'Long-horizon target'},
+];
+
+const MILESTONES = [
+  {phase:'3 Months', items:[
+    'Secure Junior Fund Accounting / PE Fund Accounting role',
+    'Complete NAV Reconciliation Python project',
+    'Land first clean month-end close independently',
+    'Set up regular 1-on-1s with senior team members',
+  ]},
+  {phase:'6 Months', items:[
+    'Own a full NAV production process without supervision',
+    'Build one automation tool for the team (reconciliation / break classification)',
+    'Enrol in AAT Level 3',
+    'Expand knowledge of illiquid asset pricing (PE context)',
+  ]},
+  {phase:'1 Year', items:[
+    'Trusted to run month-end close independently',
+    'Recognised for investigation depth and automation capability',
+    'AAT Level 3 in progress or complete',
+    'Be the person junior hires come to when something breaks',
+  ]},
+];
+
+const PROJECTS = [
+  {name:'Sigma Formula Automation',        status:'live',    desc:'Standard deviation day-on-day across 5 products simultaneously. In production at JPM.',       stack:'Python · Excel'},
+  {name:'Z-Score Totem Outlier Detection', status:'live',    desc:'Flags statistically anomalous dealer submissions automatically. In production at JPM.',       stack:'Python · Excel'},
+  {name:'Corporate Command Centre',        status:'live',    desc:'This dashboard — AI-powered workplace survival OS for neurodivergent finance professionals.',  stack:'HTML · JS · Claude API'},
+  {name:'AI Job Application Tracker',      status:'live',    desc:'React + Claude API tracker: JD extraction, tailored CVs, pipeline status, follow-up alerts.', stack:'React · Claude API'},
+  {name:'Discere',                         status:'active',  desc:'Behavioural finance startup — React UI + Python FastAPI backend. Investor deck stage.',        stack:'React · FastAPI · Python'},
+  {name:'NAV Reconciliation Tool',         status:'planned', desc:'Python project mirroring fund accounting workflows — break investigation, tolerance thresholds.',stack:'Python'},
+  {name:'Valuation Reconciliation Engine', status:'planned', desc:'IPV methodology — internal marks vs. external benchmarks. Mirrors daily VCG workflow.',       stack:'Python'},
+  {name:'LinkedIn Skill Extraction Tool',  status:'live',    desc:'Claude API + web search for live job skill extraction. Ported to Jupyter.',                   stack:'Python · Claude API'},
+];
+
+const STATUS_STYLE = {
+  applied:   {l:'Applied',   cls:'bc'},
+  screen:    {l:'Screening', cls:'bp'},
+  interview: {l:'Interview', cls:'ba'},
+  offer:     {l:'Offer',     cls:'bg'},
+  rejected:  {l:'Rejected',  cls:'br'},
+};
+
+// ─── CAREER RENDERS ───────────────────────────────────────
+function renderCareer() {
+  renderTimeline(); renderSkills(); renderQuals(); renderPipeline(); renderMilestones(); renderProjects();
+}
+
+function renderTimeline() {
+  document.getElementById('exp-timeline').innerHTML = EXPERIENCE.map(e => `
+    <div style="position:relative;margin-bottom:18px;padding-left:16px">
+      <div style="position:absolute;left:-14px;top:4px;width:10px;height:10px;border-radius:50%;background:${e.colour}"></div>
+      <div style="font-size:13px;font-weight:700">${esc(e.role)}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${esc(e.co)} · ${esc(e.dates)}</div>
+      <ul style="padding-left:14px;margin:0">${e.bullets.map(b=>`<li style="font-size:12px;color:var(--muted);margin-bottom:2px">${esc(b)}</li>`).join('')}</ul>
+    </div>`).join('');
+}
+
+function renderSkills() {
+  const total = SKILLS_DEF.reduce((s,k)=>s+(S.skills?.[k.id]??k.cur),0);
+  const max = SKILLS_DEF.length * 10;
+  document.getElementById('skills-pct').textContent = `${Math.round((total/max)*100)}% overall`;
+  document.getElementById('skills-list').innerHTML = SKILLS_DEF.map(k => {
+    const cur = S.skills?.[k.id] ?? k.cur;
+    const col = cur >= k.tgt ? '#3fb950' : cur >= k.tgt - 2 ? '#d29922' : '#f85149';
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:12px">${esc(k.l)}</span>
+        <span style="font-size:12px;color:${col};font-weight:700">${cur} / ${k.tgt}</span>
+      </div>
+      <div style="position:relative;height:6px;background:var(--border);border-radius:3px">
+        <div style="position:absolute;left:0;top:0;height:100%;width:${(k.tgt/10)*100}%;background:var(--green-soft);border-radius:3px"></div>
+        <div style="position:absolute;left:0;top:0;height:100%;width:${(cur/10)*100}%;background:${col};border-radius:3px;transition:width 0.3s"></div>
+      </div>
+      <input type="range" min="1" max="10" value="${cur}" style="width:100%;margin-top:3px;-webkit-appearance:none;height:2px;background:transparent;outline:none;cursor:pointer" oninput="setSkill('${k.id}',+this.value)">
+    </div>`;
+  }).join('');
+}
+
+function setSkill(id, v) {
+  if (!S.skills) S.skills = {};
+  S.skills[id] = v;
+  renderSkills(); save();
+}
+
+function renderQuals() {
+  const done = QUALS.filter(q=>q.done);
+  const next = QUALS.filter(q=>!q.done);
+  document.getElementById('qual-list').innerHTML = done.map(q=>`
+    <div class="titem">
+      <div class="tchk on"></div>
+      <div style="flex:1"><div class="ttxt">${esc(q.label)}</div><div style="font-size:11px;color:var(--muted)">${esc(q.inst)}</div></div>
+    </div>`).join('');
+  document.getElementById('qual-next').innerHTML = next.map((q,i)=>`
+    <div class="titem">
+      <div class="tchk${S.qualDone?.[i]?' on':''}" onclick="toggleQual(${i})"></div>
+      <div style="flex:1"><div class="ttxt">${esc(q.label)}</div><div style="font-size:11px;color:var(--muted)">${esc(q.inst)}</div></div>
+    </div>`).join('');
+}
+
+function toggleQual(i) {
+  if (!S.qualDone) S.qualDone = {};
+  S.qualDone[i] = !S.qualDone[i];
+  renderQuals(); save();
+}
+
+function renderPipeline() {
+  const apps = S.apps || [];
+  const stages = ['applied','screen','interview','offer','rejected'];
+  if (!apps.length) {
+    document.getElementById('pipeline-board').innerHTML = '<div style="color:var(--muted);font-size:13px">No applications yet — add one above</div>';
+    return;
+  }
+  document.getElementById('pipeline-board').innerHTML = stages.map(st => {
+    const items = apps.filter(a=>a.status===st);
+    if (!items.length) return '';
+    const {l, cls} = STATUS_STYLE[st];
+    return `<div style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;color:var(--muted)">${l} (${items.length})</div>
+      ${items.map((a,gi)=>{
+        const realIdx = apps.indexOf(a);
+        return `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:var(--r);margin-bottom:4px">
+          <span class="badge ${cls}" style="font-size:9px">${l}</span>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(a.co)}</div><div style="font-size:11px;color:var(--muted)">${esc(a.role)}${a.date?` · ${a.date}`:''}</div></div>
+          <select style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:3px 5px;color:var(--text);font-size:10px;font-family:var(--font);outline:none;cursor:pointer" onchange="updateAppStatus(${realIdx},this.value)">
+            ${stages.map(s=>`<option value="${s}"${s===a.status?' selected':''}>${STATUS_STYLE[s].l}</option>`).join('')}
+          </select>
+          <button onclick="removeApp(${realIdx})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 2px">×</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function toggleAddApp() {
+  const f=document.getElementById('add-app-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+}
+
+function saveApp() {
+  const co=document.getElementById('app-co').value.trim();
+  if(!co) return;
+  if(!S.apps) S.apps=[];
+  S.apps.push({co, role:document.getElementById('app-role').value.trim(), status:document.getElementById('app-status').value, date:document.getElementById('app-date').value});
+  document.getElementById('app-co').value=''; document.getElementById('app-role').value='';
+  document.getElementById('add-app-form').style.display='none';
+  renderPipeline(); save();
+}
+
+function updateAppStatus(i,v){S.apps[i].status=v;renderPipeline();save();}
+function removeApp(i){S.apps.splice(i,1);renderPipeline();save();}
+
+function renderMilestones() {
+  const total = MILESTONES.reduce((s,m)=>s+m.items.length,0);
+  const done = MILESTONES.reduce((s,m,mi)=>s+m.items.filter((_,ii)=>S.milestones?.[`${mi}-${ii}`]).length,0);
+  document.getElementById('milestone-pct').textContent=`${done}/${total} done`;
+  document.getElementById('milestone-list').innerHTML = MILESTONES.map((m,mi)=>`
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">${m.phase}</div>
+      ${m.items.map((item,ii)=>`
+        <div class="titem">
+          <div class="tchk${S.milestones?.[`${mi}-${ii}`]?' on':''}" onclick="toggleMilestone(${mi},${ii})"></div>
+          <span class="ttxt${S.milestones?.[`${mi}-${ii}`]?' done':''}">${esc(item)}</span>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function toggleMilestone(mi,ii){
+  if(!S.milestones) S.milestones={};
+  S.milestones[`${mi}-${ii}`]=!S.milestones[`${mi}-${ii}`];
+  renderMilestones(); save();
+}
+
+function renderProjects() {
+  const live=PROJECTS.filter(p=>p.status==='live').length;
+  document.getElementById('proj-ct').textContent=`${live} live · ${PROJECTS.filter(p=>p.status==='planned').length} planned`;
+  const badge={live:'bg',active:'bc',planned:'ba'};
+  const label={live:'Live',active:'In progress',planned:'Planned'};
+  document.getElementById('proj-list').innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+    ${PROJECTS.map(p=>`
+      <div style="background:var(--surface2);border-radius:var(--r);padding:12px;border:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+          <div style="font-size:13px;font-weight:700;flex:1">${esc(p.name)}</div>
+          <span class="badge ${badge[p.status]}" style="font-size:9px;margin-left:8px;flex-shrink:0">${label[p.status]}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${esc(p.desc)}</div>
+        <div style="font-size:10px;color:var(--accent)">${esc(p.stack)}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ─── UTILS ────────────────────────────────────────────────
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ─── INIT ─────────────────────────────────────────────────
+function init(){
+  load();
+  tick(); setInterval(tick,1000);
+  if(S.ci.done){
+    document.getElementById('sl-energy').value=S.ci.energy;
+    document.getElementById('sl-mask').value=S.ci.mask;
+    document.getElementById('sv-energy').textContent=S.ci.energy;
+    document.getElementById('sv-mask').textContent=S.ci.mask;
+    document.getElementById('ci-priority').value=S.ci.priority||'';
+    document.getElementById('ci-badge').textContent='Done ✓';
+    document.getElementById('ci-badge').className='badge bg';
+  }
+  renderTasks(); renderWins(); renderInterview(); renderPeople();
+  renderQB(); renderGrowth(); renderMetrics(); renderPhrases();
+  updateBurnout(); renderWellbeing();
+  if(!API_KEY) setTimeout(openSettings, 600);
+}
+
+init();
+</script>
+</body>
+</html>
