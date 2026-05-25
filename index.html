@@ -137,6 +137,11 @@
     .ph-before { font-size: 12px; color: var(--red); margin-bottom: 4px; }
     .ph-after { font-size: 13px; color: var(--green); font-weight: 500; }
 
+    /* BOOKS */
+    .book-card { border: 1px solid var(--border); border-radius: var(--rl); padding: 16px; margin-bottom: 12px; }
+    .book-teaching { background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 var(--r) var(--r) 0; padding: 12px 14px; margin-top: 10px; }
+    .book-quote { font-size: 12px; color: var(--muted); font-style: italic; border-left: 2px solid var(--border); padding-left: 10px; margin-top: 8px; line-height: 1.5; }
+
     /* GROWTH */
     .cad { border: 1px solid var(--border); border-radius: var(--r); padding: 12px; margin-bottom: 10px; }
     .cadh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -306,6 +311,7 @@
     <button class="tbtn" onclick="showTab('tracker-tab')">Tracker</button>
     <button class="tbtn" onclick="showTab('phrases-tab')">Phrases</button>
     <button class="tbtn" onclick="showTab('career-tab')">Career</button>
+    <button class="tbtn" onclick="showTab('books-tab')">Books</button>
   </div>
 
   <!-- DECODE -->
@@ -530,6 +536,20 @@
 
   </div>
 
+  <!-- BOOKS -->
+  <div id="books-tab" class="tc">
+    <div class="card">
+      <div class="ch"><span class="ct">Power Coaching</span><span class="badge bp" id="books-badge">2 books</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Teachings from your books, matched to your current state. Complete the morning check-in for personalised guidance.</div>
+      <div id="books-state-bar" style="padding:10px 14px;background:var(--surface2);border-radius:var(--r);margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"></div>
+      <div id="books-list"></div>
+      <div class="divlbl">AI Coaching</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Uses both books + your current state to generate a bespoke coaching message.</div>
+      <button class="btn btn-p btn-full" onclick="doBookCoach()">Get personalised coaching →</button>
+      <div id="book-coach-out" style="display:none;margin-top:12px" class="dr"></div>
+    </div>
+  </div>
+
 </main>
 
 <!-- EMERGENCY -->
@@ -650,6 +670,61 @@ const CADENCES = [
   {name:'Yearly', time:'2–3 hrs', items:['Full network map — sponsors, advocates, neutrals, detractors','BATNA — what is my alternative to staying?','Masking sustainability — is this career sustainable for me?','Identity check — does this still align with who I want to be?']},
 ];
 
+const BOOKS = [
+  {
+    id: 'atomic-habits',
+    title: 'Atomic Habits',
+    author: 'James Clear',
+    colour: 'var(--accent)',
+    tagline: 'Systems over goals. Identity over outcomes.',
+    emoji: '🔁',
+    teachings: [
+      {trigger:'burnout',
+       headline:'Never miss twice.',
+       body:'One push-up counts. One sentence counts. The standard is not perfection — it\'s continuity. After a bad day the minimum viable version of the habit is enough. Show up at 10% and you preserve the identity.',
+       quote:'"You don\'t rise to the level of your goals. You fall to the level of your systems."'},
+      {trigger:'energy_low',
+       headline:'Reduce friction — let environment carry you.',
+       body:'Willpower tracks energy. When energy is low, stop relying on willpower. Pre-load the environment: close all tabs except one, put the task document open, set a 25-minute timer. The behaviour follows the path of least resistance — design the path.',
+       quote:'"Make it easy. Reduce the friction associated with good habits."'},
+      {trigger:'masking_high',
+       headline:'Habits protect the depleted self.',
+       body:'You have spent significant cognitive budget on social performance today. The Four Laws say: make the behaviour obvious, attractive, easy, and satisfying. The most important one right now is easy. Automate the next required action so it needs no decision.',
+       quote:'"Environment is the invisible hand that shapes human behaviour."'},
+      {trigger:'performing',
+       headline:'Goldilocks Rule: push the edge.',
+       body:'You are in peak performance territory. The optimal challenge sits just at the edge of current ability — hard enough to be engaging, achievable enough to complete. Identify one thing today that is slightly uncomfortable and do it before it becomes comfortable.',
+       quote:'"The Goldilocks Rule: humans experience peak motivation when working at the edge of their current abilities."'},
+    ]
+  },
+  {
+    id: 'unspoken-rules',
+    title: 'The Unspoken Rules',
+    author: 'Gorick Ng',
+    colour: 'var(--purple)',
+    tagline: 'Competence · Commitment · Compatibility',
+    emoji: '🗺',
+    teachings: [
+      {trigger:'burnout',
+       headline:'Narrow your footprint. Own one thing visibly.',
+       body:'When overwhelmed, do not expand your footprint. Narrow to what is clearly yours. One task done visibly and completely signals more Competence than three tasks done at 60%. Communicate early: "I am working on X. I will update you by [time]." That single message covers Commitment and buys breathing space.',
+       quote:'"No one will care more about your success than you."'},
+      {trigger:'energy_low',
+       headline:'One signal of engagement outweighs an hour of invisible effort.',
+       body:'Low energy does not mean low visibility. Send one proactive update. Ask one good prepared question in the next meeting. The Three Cs are evaluated on signals, not hours. A visible 20% beats an invisible 100%.',
+       quote:'"Intent is what you mean. Impact is how you come across. You know your intent; others do not."'},
+      {trigger:'masking_high',
+       headline:'The performance cost is real — and it does not show in the output.',
+       body:'High masking load means you have been translating yourself all day. That cognitive work is real and invisible to others. Protect your remaining capacity: end unnecessary meetings early, batch communications, and remember that your difference is not a liability — the book is explicit on this. You do not have to perform normalcy. You have to perform Competence.',
+       quote:'"Your uniqueness is not a liability. It is an asset."'},
+      {trigger:'performing',
+       headline:'Find an unoccupied swimlane and claim it.',
+       body:'When you are performing well, the highest-leverage question is: "What can I do that hasn\'t been done?" Identify one area nobody owns — a process, a bridge, a gap — and claim it with visible output. This is the mechanism of promotion, not performance review conversations.',
+       quote:'"The key to getting promoted is to find an unoccupied swimlane that matters to your team — and then claim it."'},
+    ]
+  }
+];
+
 const METRICS_DEF = [
   {id:'tech', l:'Technical Accuracy', b:8},
   {id:'speed', l:'Delivery Speed', b:7},
@@ -695,7 +770,7 @@ function uCI() {
   document.getElementById('sv-energy').textContent=e;
   document.getElementById('sv-mask').textContent=m;
   S.ci.energy=+e; S.ci.mask=+m;
-  updateBurnout(); renderWellbeing();
+  updateBurnout(); renderWellbeing(); maybeRenderBooks();
 }
 
 function saveCI() {
@@ -703,7 +778,7 @@ function saveCI() {
   S.ci.done=true;
   document.getElementById('ci-badge').textContent='Done ✓';
   document.getElementById('ci-badge').className='badge bg';
-  save(); updateBurnout(); renderWellbeing();
+  save(); updateBurnout(); renderWellbeing(); maybeRenderBooks();
 }
 
 // ─── BURNOUT ──────────────────────────────────────────────
@@ -908,8 +983,68 @@ function renderPhrases(){
     </div>`).join('');
 }
 
+// ─── BOOKS ────────────────────────────────────────────────
+function renderBooks() {
+  const e = S.ci.energy, m = S.ci.mask;
+  const risk = Math.min(100, Math.max(0, Math.round((10-e)*5 + m*5)));
+  let state = 'performing';
+  if (risk > 60)    state = 'burnout';
+  else if (e <= 4)  state = 'energy_low';
+  else if (m >= 7)  state = 'masking_high';
+
+  const labels = {
+    performing:   {text:`Energy ${e}/10 · Masking ${m}/10 · Burnout ${risk}% — you're in the performance zone.`, col:'var(--green)',  badge:'✓ Performing well'},
+    burnout:      {text:`Burnout risk at ${risk}% — switching to recovery teachings.`,                             col:'var(--red)',    badge:'⚠ High burnout'},
+    energy_low:   {text:`Energy at ${e}/10 — low-friction strategies surfaced.`,                                  col:'var(--amber)',  badge:'⚠ Low energy'},
+    masking_high: {text:`Masking load at ${m}/10 — high social cost detected.`,                                   col:'var(--amber)',  badge:'⚠ High masking load'},
+  };
+  const sl = labels[state];
+  document.getElementById('books-badge').textContent = `${BOOKS.length} books`;
+  document.getElementById('books-state-bar').innerHTML =
+    `<span style="font-weight:700;color:${sl.col}">${sl.badge}</span><span style="color:var(--muted)">${sl.text}</span>`;
+
+  document.getElementById('books-list').innerHTML = BOOKS.map(b => {
+    const t = b.teachings.find(x => x.trigger === state) || b.teachings[0];
+    return `<div class="book-card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:44px;height:44px;border-radius:10px;background:${b.colour}20;color:${b.colour};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${b.emoji}</div>
+        <div>
+          <div style="font-size:14px;font-weight:700">${esc(b.title)}</div>
+          <div style="font-size:11px;color:var(--muted)">${esc(b.author)} · <em>${esc(b.tagline)}</em></div>
+        </div>
+      </div>
+      <div class="book-teaching" style="border-left-color:${b.colour}">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:${b.colour}">${esc(t.headline)}</div>
+        <div style="font-size:13px;line-height:1.65">${esc(t.body)}</div>
+        <div class="book-quote">${esc(t.quote)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function maybeRenderBooks() {
+  if (document.getElementById('books-tab')?.classList.contains('on')) renderBooks();
+}
+
+async function doBookCoach() {
+  const e = S.ci.energy, m = S.ci.mask;
+  const risk = Math.min(100, Math.max(0, Math.round((10-e)*5 + m*5)));
+  const priority = S.ci.priority || 'not set';
+  const out = document.getElementById('book-coach-out');
+  out.style.display = 'block';
+  out.innerHTML = dots();
+  out.innerHTML = await ai(
+    `You are a personal coach advising Nya-Raeann, a neurodivergent Black British finance professional in London. ` +
+    `You draw on two books she has studied: Atomic Habits by James Clear, and The Unspoken Rules by Gorick Ng.\n\n` +
+    `Her current state:\n- Energy: ${e}/10\n- Masking load: ${m}/10\n- Burnout risk: ${risk}%\n- Today's top priority: "${priority}"\n\n` +
+    `From Atomic Habits: identity-based habits, Four Laws (obvious/attractive/easy/satisfying), never miss twice, environment design, Goldilocks Rule (work at the edge of ability).\n\n` +
+    `From The Unspoken Rules: Three Cs (Competence, Commitment, Compatibility), intent vs. impact, find unoccupied swimlanes, never surprise your manager, relationship capital, "your uniqueness is not a liability."\n\n` +
+    `Write exactly one paragraph of 4–5 sentences. Draw on both books. Be direct and specific to her state and priority today. Speak to her as someone who knows her. No headers, no bullet points, no preamble.`
+  );
+}
+
 // ─── TABS ─────────────────────────────────────────────────
-const TABS=['decode-tab','tasks-tab','qbank-tab','growth-tab','metrics-tab','people-tab','wellbeing-tab','tracker-tab','phrases-tab','career-tab'];
+const TABS=['decode-tab','tasks-tab','qbank-tab','growth-tab','metrics-tab','people-tab','wellbeing-tab','tracker-tab','phrases-tab','career-tab','books-tab'];
 function showTab(id){
   TABS.forEach(t=>document.getElementById(t).classList.remove('on'));
   document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
@@ -921,6 +1056,7 @@ function showTab(id){
   if(id==='metrics-tab')renderMetrics();
   if(id==='tracker-tab')renderWins();
   if(id==='career-tab')renderCareer();
+  if(id==='books-tab')renderBooks();
 }
 
 // ─── WIKI DATA LOADER ─────────────────────────────────────
