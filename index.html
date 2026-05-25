@@ -565,7 +565,7 @@
 let API_KEY = localStorage.getItem('ccc_api_key') || '';
 
 // ─── DATA ─────────────────────────────────────────────────
-const QUESTIONS = [
+let QUESTIONS = [
   {cat:'Opening', q:'Tell me about yourself.'},
   {cat:'Opening', q:'Why are you leaving JPMorgan?'},
   {cat:'Opening', q:'Why leave without something lined up?'},
@@ -601,7 +601,7 @@ const QUESTIONS = [
   {cat:'Behavioural', q:'Are you applying to other roles?'},
 ];
 
-const QBANK = [
+let QBANK = [
   {cat:'ownership', q:'Who owns the final decision on this?'},
   {cat:'ownership', q:"If I complete this, what does success look like to you?"},
   {cat:'ownership', q:'What would you do differently if you were doing this yourself?'},
@@ -923,6 +923,23 @@ function showTab(id){
   if(id==='career-tab')renderCareer();
 }
 
+// ─── WIKI DATA LOADER ─────────────────────────────────────
+async function fetchWikiData() {
+  const get = url => fetch(url).then(r => r.ok ? r.json() : null).catch(() => null);
+  const [career, interview] = await Promise.all([get('wiki/career.json'), get('wiki/interview.json')]);
+  if (career) {
+    if (career.experience)     EXPERIENCE = career.experience;
+    if (career.skills)         SKILLS_DEF = career.skills;
+    if (career.qualifications) QUALS = career.qualifications;
+    if (career.milestones)     MILESTONES = career.milestones;
+    if (career.projects)       PROJECTS = career.projects;
+  }
+  if (interview) {
+    if (interview.questions) QUESTIONS = interview.questions;
+    if (interview.qbank)     QBANK = interview.qbank;
+  }
+}
+
 // ─── SETTINGS ─────────────────────────────────────────────
 function openSettings(){
   const ov=document.getElementById('settings-ov');
@@ -1015,7 +1032,7 @@ async function doRephrase(){
 }
 
 // ─── CAREER DATA ──────────────────────────────────────────
-const EXPERIENCE = [
+let EXPERIENCE = [
   {role:'Valuation Controller Analyst', co:'J.P. Morgan', dates:'Jul 2024 – May 2026', colour:'var(--accent)',
    bullets:['Independent price verification across IR & fixed income products','Daily P&L, month-end close, audit documentation','Sigma formula automation + z-score Totem outlier detection (both in production)','Bloomberg, Athena, Orion, Python, Excel, Alteryx']},
   {role:'Junior Full-Stack Software Engineer', co:'Deutsche Bank', dates:'Jul 2022 – May 2023', colour:'var(--amber)',
@@ -1024,7 +1041,7 @@ const EXPERIENCE = [
    bullets:['Reconciliations, invoice processing, accounts receivable','Early exposure to financial accuracy and controls work']},
 ];
 
-const SKILLS_DEF = [
+let SKILLS_DEF = [
   {id:'sk-python',   l:'Python',                  cur:7,  tgt:9},
   {id:'sk-sql',      l:'SQL',                     cur:7,  tgt:8},
   {id:'sk-excel',    l:'Excel (Advanced)',         cur:8,  tgt:9},
@@ -1037,7 +1054,7 @@ const SKILLS_DEF = [
   {id:'sk-controls', l:'Controls & Reconciliation',cur:8,  tgt:9},
 ];
 
-const QUALS = [
+let QUALS = [
   {label:'GCSEs — 9 subjects (grades 9–4)',          done:true,  inst:'St Matthew Academy'},
   {label:'Albany Beck Software Engineering Programme',done:true,  inst:'Albany Beck 2022'},
   {label:'La Fosse Tech Pioneer Programme',           done:true,  inst:'La Fosse Academy 2024'},
@@ -1049,7 +1066,7 @@ const QUALS = [
   {label:'CFA Level 1',                               done:false, inst:'Long-horizon target'},
 ];
 
-const MILESTONES = [
+let MILESTONES = [
   {phase:'3 Months', items:[
     'Secure Junior Fund Accounting / PE Fund Accounting role',
     'Complete NAV Reconciliation Python project',
@@ -1070,7 +1087,7 @@ const MILESTONES = [
   ]},
 ];
 
-const PROJECTS = [
+let PROJECTS = [
   {name:'Sigma Formula Automation',        status:'live',    desc:'Standard deviation day-on-day across 5 products simultaneously. In production at JPM.',       stack:'Python · Excel'},
   {name:'Z-Score Totem Outlier Detection', status:'live',    desc:'Flags statistically anomalous dealer submissions automatically. In production at JPM.',       stack:'Python · Excel'},
   {name:'Corporate Command Centre',        status:'live',    desc:'This dashboard — AI-powered workplace survival OS for neurodivergent finance professionals.',  stack:'HTML · JS · Claude API'},
@@ -1241,7 +1258,8 @@ function renderProjects() {
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ─── INIT ─────────────────────────────────────────────────
-function init(){
+async function init(){
+  await fetchWikiData();
   load();
   tick(); setInterval(tick,1000);
   if(S.ci.done){

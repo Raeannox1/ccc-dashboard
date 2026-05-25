@@ -1,0 +1,139 @@
+{
+  "experience": [
+    {
+      "role": "Valuation Controller Analyst",
+      "co": "J.P. Morgan",
+      "dates": "Jul 2024 – May 2026",
+      "colour": "#58a6ff",
+      "bullets": [
+        "Independent price verification across IR & fixed income products",
+        "Daily P&L, month-end close, audit documentation",
+        "Sigma formula automation + z-score Totem outlier detection (both in production)",
+        "Bloomberg, Athena, Orion, Python, Excel, Alteryx"
+      ]
+    },
+    {
+      "role": "Junior Full-Stack Software Engineer",
+      "co": "Deutsche Bank",
+      "dates": "Jul 2022 – May 2023",
+      "colour": "#d29922",
+      "bullets": [
+        "Built and maintained internal finance applications",
+        "Test coverage 60% → 90%+; dashboard load time reduced ~50%",
+        "SQL, Java, Spring Boot, cross-functional delivery"
+      ]
+    },
+    {
+      "role": "Junior Accounts Assistant",
+      "co": "Tarem Services Limited",
+      "dates": "Jul 2021 – Dec 2022",
+      "colour": "#3fb950",
+      "bullets": [
+        "Reconciliations, invoice processing, accounts receivable",
+        "Early exposure to financial accuracy and controls work"
+      ]
+    }
+  ],
+  "skills": [
+    {"id": "sk-python",    "l": "Python",                   "cur": 7, "tgt": 9},
+    {"id": "sk-sql",       "l": "SQL",                      "cur": 7, "tgt": 8},
+    {"id": "sk-excel",     "l": "Excel (Advanced)",          "cur": 8, "tgt": 9},
+    {"id": "sk-alteryx",   "l": "Alteryx",                  "cur": 6, "tgt": 8},
+    {"id": "sk-bloomberg", "l": "Bloomberg Terminal",        "cur": 8, "tgt": 9},
+    {"id": "sk-tableau",   "l": "Tableau",                  "cur": 6, "tgt": 7},
+    {"id": "sk-fundacc",   "l": "Fund Accounting (NAV)",     "cur": 4, "tgt": 9},
+    {"id": "sk-geneva",    "l": "Geneva / Investran",        "cur": 3, "tgt": 8},
+    {"id": "sk-markets",   "l": "Financial Markets",         "cur": 8, "tgt": 9},
+    {"id": "sk-controls",  "l": "Controls & Reconciliation", "cur": 8, "tgt": 9}
+  ],
+  "qualifications": [
+    {"label": "GCSEs — 9 subjects (grades 9–4)",           "done": true,  "inst": "St Matthew Academy"},
+    {"label": "Albany Beck Software Engineering Programme", "done": true,  "inst": "Albany Beck 2022"},
+    {"label": "La Fosse Tech Pioneer Programme",            "done": true,  "inst": "La Fosse Academy 2024"},
+    {"label": "AAT Level 2",                                "done": true,  "inst": "Accounting qualification"},
+    {"label": "Tableau Certification",                      "done": true,  "inst": "Tableau"},
+    {"label": "Financial Analyst Training",                 "done": true,  "inst": "Self-directed"},
+    {"label": "AAT Level 3",                                "done": false, "inst": "Next qualification target"},
+    {"label": "AAT Level 4",                                "done": false, "inst": "Planned after Level 3"},
+    {"label": "CFA Level 1",                                "done": false, "inst": "Long-horizon target"}
+  ],
+  "milestones": [
+    {
+      "phase": "3 Months",
+      "items": [
+        "Secure Junior Fund Accounting / PE Fund Accounting role",
+        "Complete NAV Reconciliation Python project",
+        "Land first clean month-end close independently",
+        "Set up regular 1-on-1s with senior team members"
+      ]
+    },
+    {
+      "phase": "6 Months",
+      "items": [
+        "Own a full NAV production process without supervision",
+        "Build one automation tool for the team (reconciliation / break classification)",
+        "Enrol in AAT Level 3",
+        "Expand knowledge of illiquid asset pricing (PE context)"
+      ]
+    },
+    {
+      "phase": "1 Year",
+      "items": [
+        "Trusted to run month-end close independently",
+        "Recognised for investigation depth and automation capability",
+        "AAT Level 3 in progress or complete",
+        "Be the person junior hires come to when something breaks"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Sigma Formula Automation",
+      "status": "live",
+      "desc": "Standard deviation day-on-day across 5 products simultaneously. In production at JPM.",
+      "stack": "Python · Excel"
+    },
+    {
+      "name": "Z-Score Totem Outlier Detection",
+      "status": "live",
+      "desc": "Flags statistically anomalous dealer submissions automatically. In production at JPM.",
+      "stack": "Python · Excel"
+    },
+    {
+      "name": "Corporate Command Centre",
+      "status": "live",
+      "desc": "This dashboard — AI-powered workplace survival OS for neurodivergent finance professionals.",
+      "stack": "HTML · JS · Claude API"
+    },
+    {
+      "name": "AI Job Application Tracker",
+      "status": "live",
+      "desc": "React + Claude API tracker: JD extraction, tailored CVs, pipeline status, follow-up alerts.",
+      "stack": "React · Claude API"
+    },
+    {
+      "name": "Discere",
+      "status": "active",
+      "desc": "Behavioural finance startup — React UI + Python FastAPI backend. Investor deck stage.",
+      "stack": "React · FastAPI · Python"
+    },
+    {
+      "name": "NAV Reconciliation Tool",
+      "status": "planned",
+      "desc": "Python project mirroring fund accounting workflows — break investigation, tolerance thresholds.",
+      "stack": "Python"
+    },
+    {
+      "name": "Valuation Reconciliation Engine",
+      "status": "planned",
+      "desc": "IPV methodology — internal marks vs. external benchmarks. Mirrors daily VCG workflow.",
+      "stack": "Python"
+    },
+    {
+      "name": "LinkedIn Skill Extraction Tool",
+      "status": "live",
+      "desc": "Claude API + web search for live job skill extraction. Ported to Jupyter.",
+      "stack": "Python · Claude API"
+    }
+  ]
+}
